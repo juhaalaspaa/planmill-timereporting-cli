@@ -1,0 +1,20 @@
+{
+  "name": "planmillcli",
+  "version": "1.0.0",
+  "description": "CLI sovellus, jolla voi kätevästi tehdä tuntikirjaukset Planmilla APIa hyödyntäen",
+  "main": "./bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "juha.alaspaa@alfame.com",
+  "license": "ISC",
+  "bin": {
+    "pm": "./bin/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.3.4",
+    "form-data": "^4.0.0",
+    "inquirer": "^8.0.0",
+    "yargs": "^17.7.1"
+  }
+}

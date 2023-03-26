@@ -1,0 +1,16 @@
+{
+  "planmill": {
+    "baseUrl": "",
+    "accessTokenUri": "",
+    "clientId": "",
+    "clientSecret": "",
+    "userId": 0
+  },
+  "filePaths": {
+    "token": "c:\\temp\\planmill\\token.json",
+    "tasks": "c:\\temp\\planmill\\tasks.json",
+    "projects": "c:\\temp\\planmill\\projects.json",
+    "timeReportsFolder": "c:\\temp\\planmill\\timereports"
+  },
+  "workStartHour24clock": 8
+}
