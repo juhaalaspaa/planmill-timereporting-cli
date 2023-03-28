@@ -4,7 +4,9 @@
     "accessTokenUri": "",
     "clientId": "",
     "clientSecret": "",
-    "userId": 0
+    "userId": 0,
+    "additionalProjectIdsToFetch": [],
+    "projectIdsNotToFetch": []
   },
   "filePaths": {
     "token": "c:\\temp\\planmill\\token.json",

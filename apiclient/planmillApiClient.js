@@ -1,7 +1,7 @@
 const config = require("../config/default");
 const FormData = require("form-data");
 const axios = require("axios");
-const fs = require('fs');
+const fs = require("fs");
 
 const getToken = async () => {
   try {
@@ -25,14 +25,19 @@ const getToken = async () => {
     headers: { ...form.getHeaders() },
   }).then((response) => {
     let token = response.data;
-    token.expireTime = new Date(new Date().getTime() + 60*60000);
+    token.expireTime = new Date(new Date().getTime() + 60 * 60000);
 
-    fs.writeFile(config.filePaths.token, JSON.stringify(token), { flag: 'w' }, err => {
-      if (err) {
-        console.error(err);
+    fs.writeFile(
+      config.filePaths.token,
+      JSON.stringify(token),
+      { flag: "w" },
+      (err) => {
+        if (err) {
+          console.error(err);
+        }
+        // file written successfully
       }
-      // file written successfully
-    });
+    );
     return response.data;
   });
 };
@@ -40,35 +45,32 @@ const getToken = async () => {
 const getTasks = async () => {
   const token = await getToken();
 
-  const projects = await axios({
-    method: "get",
-    url: `${config.planmill.baseUrl}projects?rowcount=500&viewtemplate=10`,
-    headers: {
-      Authorization: `Bearer ${token.access_token}`,
-    },
-  });
+  const filteredProjects = await getProjects(token);
 
-  const temp = await Promise.all(projects.data.map(project => {
-    return axios({
+  const taskResponses = await Promise.all(
+    filteredProjects.map((project) => {
+      return axios({
         method: "get",
         url: `${config.planmill.baseUrl}projects/${project.id}/tasks`,
         headers: {
-            Authorization: `Bearer ${token.access_token}`,
+          Authorization: `Bearer ${token.access_token}`,
         },
-    });
-  }));
+      });
+    })
+  );
 
   const allTasks = [];
 
-  temp.map(t => { 
-    return t.data.map(d => { allTasks.push(d); }); 
+  taskResponses.map((t) => {
+    return t.data.map((d) => {
+      allTasks.push(d);
+    });
   });
 
-  return { tasks: allTasks, projects: projects.data };
+  return { tasks: allTasks, projects: filteredProjects };
 };
 
 const postTimeReport = async (timeReport) => {
-
   const pmTimeReport = {
     start: new Date(timeReport.start).toISOString().replace("Z", "+0000"),
     finish: new Date(timeReport.finish).toISOString().replace("Z", "+0000"),
@@ -76,8 +78,8 @@ const postTimeReport = async (timeReport) => {
     person: config.planmill.userId,
     amount: timeReport.hours * 60,
     comment: timeReport.description,
-    task: timeReport.taskId
-  }
+    task: timeReport.taskId,
+  };
 
   const token = await getToken();
 
@@ -86,8 +88,8 @@ const postTimeReport = async (timeReport) => {
     url: `${config.planmill.baseUrl}timereports`,
     data: pmTimeReport,
     headers: {
-      'Authorization': `Bearer ${token.access_token}`,
-      'Content-Type': 'application/json;charset=UTF-8'
+      Authorization: `Bearer ${token.access_token}`,
+      "Content-Type": "application/json;charset=UTF-8",
     },
   }).then((response) => {
     return response.data;
@@ -100,7 +102,7 @@ const fetchYesterdaysTimeReports = async () => {
   let url = `${config.planmill.baseUrl}timereports?person=${config.planmill.userId}&period=41`;
 
   // On monday, fetch fridays timereports
-  if(new Date().getDay() == 1) {
+  if (new Date().getDay() == 1) {
     // minus 3 days
     let intervalStart = new Date(new Date().getTime() - 3 * 86400000);
     intervalStart.setHours(0);
@@ -108,7 +110,7 @@ const fetchYesterdaysTimeReports = async () => {
     intervalStart.setSeconds(0);
     intervalStart = intervalStart.toISOString().replace("Z", "+0000");
     // minus 1-2 days
-    let intervalFinish = new Date(new Date().getTime() - 2 * 86400000); 
+    let intervalFinish = new Date(new Date().getTime() - 2 * 86400000);
     intervalFinish.setHours(0);
     intervalFinish.setMinutes(0);
     intervalFinish.setSeconds(0);
@@ -127,5 +129,41 @@ const fetchYesterdaysTimeReports = async () => {
     return response.data;
   });
 };
+
+async function getProjects(token) {
+  const projects = await axios({
+    method: "get",
+    url: `${config.planmill.baseUrl}projects?rowcount=500&viewtemplate=10`,
+    headers: {
+      Authorization: `Bearer ${token.access_token}`,
+    },
+  });
+
+  const filteredProjects = projects.data.filter((project) => {
+    return (
+      project.status < 4 &&
+      !config.planmill.projectIdsNotToFetch.some((id) => id === project.id)
+    );
+  });
+
+  const additionalProjectResponses = await Promise.all(
+    config.planmill.additionalProjectIdsToFetch.map((additionalProjectId) => {
+      return axios({
+        method: "get",
+        url: `${config.planmill.baseUrl}projects/${additionalProjectId}`,
+        headers: {
+          Authorization: `Bearer ${token.access_token}`,
+        },
+      });
+    })
+  );
+
+  let additionalProjects = additionalProjectResponses.map((p) => {
+    return p.data;
+  });
+
+  filteredProjects.push(...additionalProjects);
+  return filteredProjects;
+}
 
 module.exports = { getTasks, postTimeReport, fetchYesterdaysTimeReports };
