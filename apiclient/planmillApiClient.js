@@ -70,8 +70,8 @@ const getTasks = async () => {
 const postTimeReport = async (timeReport) => {
 
   const pmTimeReport = {
-    start: new Date(timeReport.start).toISOString().replace("Z", "+0200"),
-    finish: new Date(timeReport.finish).toISOString().replace("Z", "+0200"),
+    start: new Date(timeReport.start).toISOString().replace("Z", "+0000"),
+    finish: new Date(timeReport.finish).toISOString().replace("Z", "+0000"),
     project: timeReport.projectId,
     person: config.planmill.userId,
     amount: timeReport.hours * 60,
@@ -105,13 +105,13 @@ const fetchYesterdaysTimeReports = async () => {
     intervalStart.setHours(0);
     intervalStart.setMinutes(0);
     intervalStart.setSeconds(0);
-    intervalStart = intervalStart.toISOString().replace("Z", "+0200");
+    intervalStart = intervalStart.toISOString().replace("Z", "+0000");
     // minus 1-2 days
     let intervalFinish = new Date(new Date().getTime() - 2 * 86400000); 
     intervalFinish.setHours(0);
     intervalFinish.setMinutes(0);
     intervalFinish.setSeconds(0);
-    intervalFinish = intervalFinish.toISOString().replace("Z", "+0200");
+    intervalFinish = intervalFinish.toISOString().replace("Z", "+0000");
 
     url = `${config.planmill.baseUrl}timereports?person=${config.planmill.userId}&interval=start&intervalstart=${intervalStart}&intervalfinish=${intervalFinish}`;
   }
