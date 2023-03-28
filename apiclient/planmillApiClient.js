@@ -86,7 +86,8 @@ const postTimeReport = async (timeReport) => {
     url: `${config.planmill.baseUrl}timereports`,
     data: pmTimeReport,
     headers: {
-      Authorization: `Bearer ${token.access_token}`,
+      'Authorization': `Bearer ${token.access_token}`,
+      'Content-Type': 'application/json;charset=UTF-8'
     },
   }).then((response) => {
     return response.data;
