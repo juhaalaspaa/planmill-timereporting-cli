@@ -7,7 +7,9 @@ const tasksService = require("../services/tasks");
 const addTimeReport = (newTimeReport) => {
   let timeReports = getCurrentDateTimeReportFileContents();
 
-  let calculatedTimes = getStartAndFinishtimeFromPreviousTimeReport(newTimeReport.hours);
+  let calculatedTimes = getStartAndFinishtimeFromPreviousTimeReport(
+    newTimeReport.hours
+  );
   newTimeReport.start = calculatedTimes.start;
   newTimeReport.finish = calculatedTimes.finish;
   newTimeReport.hours = newTimeReport.hours || calculatedTimes.hours;
@@ -31,7 +33,9 @@ const pushTimeReports = () => {
 
   timeReports.forEach((tr) => {
     console.log("Pushing " + tr.description);
-    planmillApiClient.postTimeReport(tr);
+    if (tr.taskId) {
+      planmillApiClient.postTimeReport(tr);
+    }
   });
 
   console.log("Push done.");
@@ -79,12 +83,11 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
     }
   }
 
-  if(trHours) {;
+  if (trHours) {
     let millisecondsToAdd = trHours * 3600000;
     finish = new Date(new Date(start).getTime() + millisecondsToAdd);
     console.log(finish);
-  }
-  else {
+  } else {
     finish = helpers.roundTimeQuarterHour(new Date());
   }
 
@@ -142,10 +145,12 @@ const logCurrentDateTimeReportContents = (timeReports) => {
   let totalHours = 0;
 
   timeReports.forEach((timeReport, key) => {
-    let timeReportString = `${key} | ${timeReport.name} | ${timeReport.description} | ${timeReport.hours}h\r\n`;
+    let timeReportString = `${key} | ${timeReport.name || "-"} | ${timeReport.description} | ${timeReport.hours}h\r\n`;
     output = output + timeReportString;
 
-    totalHours += timeReport.hours;
+    if (timeReport.taskId) {
+      totalHours += timeReport.hours;
+    }
   });
 
   output = output + "\r\nTotal hours: " + totalHours + " h\r\n";

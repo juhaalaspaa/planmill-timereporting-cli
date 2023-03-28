@@ -119,4 +119,33 @@ yargs.command({
   },
 });
 
+
+// Log break on time report
+yargs.command({
+  command: "logb",
+  describe: "Log break on timereport",
+  builder: {
+  },
+
+  handler(argv) {
+    inquirer
+      .prompt([
+        {
+          type: "number",
+          name: "hours",
+          message: "Hours:",
+        }
+      ])
+      .then((answers) => {
+
+        const timeReport = {
+          hours: answers.hours,
+          description: "Break"
+        };
+
+        timeReportsService.addTimeReport(timeReport);
+      });
+  },
+});
+
 yargs.parse();
