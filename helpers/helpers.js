@@ -2,7 +2,8 @@ const formatDescription = (desc) => {
     desc = desc.replace("Feature ", "#");
     desc = desc.replace("Product Backlog Item ", "#");
     desc = desc.replace("Task ", "#");
-
+    desc = desc.replace("Bug ", "#");
+    
     return desc;
 }
 
