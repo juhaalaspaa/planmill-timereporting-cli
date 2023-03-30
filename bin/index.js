@@ -53,7 +53,7 @@ yargs.command({
 
 // Delete single time report
 yargs.command({
-  command: "del",
+  command: "d",
   describe: "Delete single time report",
   builder: {
     i: {
@@ -70,7 +70,7 @@ yargs.command({
 
 // Log time report
 yargs.command({
-  command: "log",
+  command: "l",
   describe: "Log timereport",
   builder: {
     t: {
@@ -122,7 +122,7 @@ yargs.command({
 
 // Log break on time report
 yargs.command({
-  command: "logb",
+  command: "b",
   describe: "Log break on timereport",
   builder: {
   },
