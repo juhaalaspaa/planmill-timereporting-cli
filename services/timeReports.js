@@ -105,6 +105,7 @@ const getYesterdaysTimeReports = async () => {
 
   let mappedTimeReports = timeReports.map((tr) => {
     return {
+      taskId: tr.task,
       start: tr.start,
       projectId: tr.project,
       hours: tr.amount / 60,
