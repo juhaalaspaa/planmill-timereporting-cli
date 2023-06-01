@@ -16,7 +16,7 @@ const addTimeReport = (newTimeReport) => {
 
   timeReports.push(newTimeReport);
 
-  logCurrentDateTimeReportContents(timeReports);
+  logTimeReportContents(timeReports);
 
   writeCurrentDateTimeReportContentsToFile(timeReports);
 };
@@ -45,7 +45,7 @@ const deleteTimeReport = (index) => {
   let timeReports = getCurrentDateTimeReportFileContents();
   timeReports.splice(index, 1);
 
-  logCurrentDateTimeReportContents(timeReports);
+  logTimeReportContents(timeReports);
 
   writeCurrentDateTimeReportContentsToFile(timeReports);
 };
@@ -86,7 +86,6 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
   if (trHours) {
     let millisecondsToAdd = trHours * 3600000;
     finish = new Date(new Date(start).getTime() + millisecondsToAdd);
-    console.log(finish);
   } else {
     finish = helpers.roundTimeQuarterHour(new Date());
   }
@@ -98,7 +97,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
 
 const getTodaysTimeReports = () => {
   let timeReports = getCurrentDateTimeReportFileContents();
-  logCurrentDateTimeReportContents(timeReports);
+  logTimeReportContents(timeReports);
 };
 
 const getYesterdaysTimeReports = async () => {
@@ -118,7 +117,7 @@ const getYesterdaysTimeReports = async () => {
     return a.hours == b.hours ? 0 : a.hours < b.hours ? 1 : -1;
   });
 
-  logCurrentDateTimeReportContents(mappedTimeReports);
+  logTimeReportContents(mappedTimeReports);
 };
 
 const getCurrentDateFilename = () => {
@@ -140,7 +139,7 @@ const getCurrentDateTimeReportFileContents = () => {
   return timeReports;
 };
 
-const logCurrentDateTimeReportContents = (timeReports) => {
+const logTimeReportContents = (timeReports) => {
   let output = "\r\n";
   let totalHours = 0;
 
