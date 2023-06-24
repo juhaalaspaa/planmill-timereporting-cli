@@ -31,15 +31,38 @@ const pushTimeReports = () => {
   let timeReportRawData = fs.readFileSync(currentDateTimeReportsFileName);
   let timeReports = JSON.parse(timeReportRawData);
 
-  timeReports.forEach((tr) => {
-    console.log("Pushing " + tr.description);
+  let timeReporsToPush = combineEqualTimeReports(timeReports);
+
+  timeReporsToPush.forEach((tr) => {
     if (tr.taskId) {
+      console.log("Pushing " + tr.description + " / " + tr.hours + " h");
       planmillApiClient.postTimeReport(tr);
     }
   });
 
   console.log("Push done.");
 };
+
+combineEqualTimeReports = (timeReports) => {
+  let timeRepostsWithEqualCombined = [];
+
+  timeReports.forEach((tr) => {
+    if (tr.taskId) {
+      let existingEqualTimeReportIndex = timeRepostsWithEqualCombined.findIndex(x => x.taskId === tr.taskId && x.description === tr.description);
+
+      if (existingEqualTimeReportIndex > -1) {
+        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].hours += tr.hours;
+        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish = helpers.addMinutes(new Date(timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish), tr.hours * 60);
+      }
+      else {
+        timeRepostsWithEqualCombined.push(tr);
+      }
+    }
+  });
+
+  return timeRepostsWithEqualCombined;
+}
+
 
 const deleteTimeReport = (index) => {
   let timeReports = getCurrentDateTimeReportFileContents();
@@ -180,3 +203,4 @@ module.exports = {
   getYesterdaysTimeReports,
   getTodaysTimeReports,
 };
+

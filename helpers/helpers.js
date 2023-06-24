@@ -21,4 +21,8 @@ const getDifferenceInMinutes = (startTime, endTime) => {
     return Math.round(difference / 60000);
 };
 
-module.exports = { formatDescription, roundTimeQuarterHour, getDifferenceInMinutes };
+function addMinutes(date, minutes) {
+    return new Date(date.getTime() + minutes*60000);
+}
+
+module.exports = { formatDescription, roundTimeQuarterHour, getDifferenceInMinutes, addMinutes };
