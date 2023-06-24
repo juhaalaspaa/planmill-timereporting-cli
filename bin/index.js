@@ -123,7 +123,7 @@ yargs.command({
 // Log break on time report
 yargs.command({
   command: "b",
-  describe: "Log break on timereport",
+  describe: "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
   builder: {
   },
 
@@ -131,7 +131,6 @@ yargs.command({
     inquirer
       .prompt([
         {
-          type: "number",
           name: "hours",
           message: "Hours:",
         }
