@@ -1,11 +1,11 @@
-const fs = require("fs");
 const planmillApiClient = require("../apiclient/planmillApiClient");
 const config = require("../config/default");
 const helpers = require("../helpers/helpers");
 const tasksService = require("../services/tasks");
+const fileService = require("../services/files");
 
 const addTimeReport = (newTimeReport) => {
-  let timeReports = getCurrentDateTimeReportFileContents();
+  let timeReports = fileService.getCurrentDateTimeReportFileContents();
 
   let calculatedTimes = getStartAndFinishtimeFromPreviousTimeReport(
     newTimeReport.hours
@@ -18,18 +18,13 @@ const addTimeReport = (newTimeReport) => {
 
   logTimeReportContents(timeReports);
 
-  writeCurrentDateTimeReportContentsToFile(timeReports);
+  fileService.writeCurrentDateTimeReportContentsToFile(timeReports);
 };
 
 const pushTimeReports = () => {
   console.log("Pushing time reports...");
 
-  let currentDate = new Date();
-  const currentDateString = currentDate.toISOString().split("T")[0];
-  let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
-
-  let timeReportRawData = fs.readFileSync(currentDateTimeReportsFileName);
-  let timeReports = JSON.parse(timeReportRawData);
+  let timeReports = fileService.getCurrentDateTimeReportFileContents();
 
   let timeReporsToPush = combineEqualTimeReports(timeReports);
 
@@ -63,18 +58,17 @@ combineEqualTimeReports = (timeReports) => {
   return timeRepostsWithEqualCombined;
 }
 
-
 const deleteTimeReport = (index) => {
-  let timeReports = getCurrentDateTimeReportFileContents();
+  let timeReports = fileService.getCurrentDateTimeReportFileContents();
   timeReports.splice(index, 1);
 
   logTimeReportContents(timeReports);
 
-  writeCurrentDateTimeReportContentsToFile(timeReports);
+  fileService.writeCurrentDateTimeReportContentsToFile(timeReports);
 };
 
 const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
-  let timeReports = getCurrentDateTimeReportFileContents();
+  let timeReports = fileService.getCurrentDateTimeReportFileContents();
   let start;
   let finish;
 
@@ -119,7 +113,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
 };
 
 const getTodaysTimeReports = () => {
-  let timeReports = getCurrentDateTimeReportFileContents();
+  let timeReports = fileService.getCurrentDateTimeReportFileContents();
   logTimeReportContents(timeReports);
 };
 
@@ -143,26 +137,6 @@ const getYesterdaysTimeReports = async () => {
 
   logTimeReportContents(mappedTimeReports);
 };
-
-const getCurrentDateFilename = () => {
-  let currentDate = new Date();
-  const currentDateString = currentDate.toISOString().split("T")[0];
-  let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
-  return currentDateTimeReportsFileName;
-};
-
-const getCurrentDateTimeReportFileContents = () => {
-  let currentDateTimeReportsFileName = getCurrentDateFilename();
-
-  let timeReports = [];
-
-  try {
-    let timeReportRawData = fs.readFileSync(currentDateTimeReportsFileName);
-    timeReports = JSON.parse(timeReportRawData);
-  } catch (e) {}
-  return timeReports;
-};
-
 const logTimeReportContents = (timeReports) => {
   let output = "\r\n";
   let totalHours = 0;
@@ -179,21 +153,6 @@ const logTimeReportContents = (timeReports) => {
   output = output + "\r\nTotal hours: " + totalHours + " h\r\n";
 
   console.log(output);
-};
-
-const writeCurrentDateTimeReportContentsToFile = (timeReports) => {
-  let currentDateTimeReportsFileName = getCurrentDateFilename();
-
-  fs.writeFile(
-    currentDateTimeReportsFileName,
-    JSON.stringify(timeReports),
-    { flag: "w" },
-    (err) => {
-      if (err) {
-        console.error(err);
-      }
-    }
-  );
 };
 
 module.exports = {

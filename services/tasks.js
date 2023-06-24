@@ -1,39 +1,17 @@
-const fs = require("fs");
 const planmillApiClient = require("../apiclient/planmillApiClient");
 const config = require("../config/default");
+const fileService = require("../services/files");
 
 const fetchTasks = async () => {
   console.log("Fetching projects and tasks..");
   const { tasks, projects } = await planmillApiClient.getTasks();
 
-  fs.writeFile(
-    config.filePaths.tasks,
-    JSON.stringify(tasks),
-    { flag: "w" },
-    (err) => {
-      if (err) {
-        console.error(err);
-      }
-      // file written successfully
-    }
-  );
-
-  fs.writeFile(
-    config.filePaths.projects,
-    JSON.stringify(projects),
-    { flag: "w" },
-    (err) => {
-      if (err) {
-        console.error(err);
-      }
-      // file written successfully
-    }
-  );
+  fileService.writeFile(config.filePaths.tasks, tasks);
+  fileService.writeFile(config.filePaths.projects, projects);
 };
 
 const getProjectNameById = (id) => {
-  let projectsRawData = fs.readFileSync(config.filePaths.projects);
-  let projects = JSON.parse(projectsRawData);
+  let projects = fileService.readAndParseFile(config.filePaths.projects);
   let foundProject = projects.find(x => x.id == id);
   
   if(foundProject) {
@@ -45,8 +23,7 @@ const getProjectNameById = (id) => {
 }
 
 const getTaskNameById = (id) => {
-  let tasksRawData = fs.readFileSync(config.filePaths.tasks);
-  let tasks = JSON.parse(tasksRawData);
+  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
   let foundTask = tasks.find(x => x.id == id);
   
   if(foundTask) {
@@ -58,8 +35,7 @@ const getTaskNameById = (id) => {
 }
 
 const loadTaskSuggestionsFromFile = (searchTerm) => {
-  let rawTaskData = fs.readFileSync(config.filePaths.tasks);
-  let tasks = JSON.parse(rawTaskData);
+  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
   let lowercaseSearchTerm = searchTerm.toLowerCase();
   let filteredTasks = tasks.filter(
     (task) =>
