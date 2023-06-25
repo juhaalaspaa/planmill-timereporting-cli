@@ -24,7 +24,7 @@ const addTimeReport = (newTimeReport) => {
 const pushTimeReports = () => {
   console.log("Pushing time reports...");
 
-  let timeReports = fileService.getCurrentDateTimeReportFileContents();
+  let timeReports = fileService.getMostRecentExistingTimeReportFileContents();
 
   let timeReporsToPush = combineEqualTimeReports(timeReports);
 
