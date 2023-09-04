@@ -4,6 +4,8 @@ const helpers = require("../helpers/helpers");
 const tasksService = require("../services/tasks");
 const fileService = require("../services/files");
 
+const numberOfPastDysToSearchWithin = 14;
+
 const addTimeReport = (newTimeReport) => {
   let timeReports = fileService.getCurrentDateTimeReportFileContents();
 
@@ -13,6 +15,22 @@ const addTimeReport = (newTimeReport) => {
   newTimeReport.start = calculatedTimes.start;
   newTimeReport.finish = calculatedTimes.finish;
   newTimeReport.hours = newTimeReport.hours || calculatedTimes.hours;
+
+  if (!newTimeReport.description) {
+    let mostRecentDescriptionForTask =
+      tasksService.getMostRecentDescriptionOnTask(
+        newTimeReport.taskId,
+        numberOfPastDysToSearchWithin
+      );
+    if (!mostRecentDescriptionForTask) {
+      console.log(
+        `Could not find any previous description for task ${newTimeReport.taskId} within ${numberOfPastDysToSearchWithin} days. Aborting...`
+      );
+      return;
+    }
+
+    newTimeReport.description = mostRecentDescriptionForTask;
+  }
 
   timeReports.push(newTimeReport);
 
@@ -43,20 +61,28 @@ combineEqualTimeReports = (timeReports) => {
 
   timeReports.forEach((tr) => {
     if (tr.taskId) {
-      let existingEqualTimeReportIndex = timeRepostsWithEqualCombined.findIndex(x => x.taskId === tr.taskId && x.description === tr.description);
+      let existingEqualTimeReportIndex = timeRepostsWithEqualCombined.findIndex(
+        (x) => x.taskId === tr.taskId && x.description === tr.description
+      );
 
       if (existingEqualTimeReportIndex > -1) {
-        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].hours += tr.hours;
-        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish = helpers.addMinutes(new Date(timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish), tr.hours * 60);
-      }
-      else {
+        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].hours +=
+          tr.hours;
+        timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish =
+          helpers.addMinutes(
+            new Date(
+              timeRepostsWithEqualCombined[existingEqualTimeReportIndex].finish
+            ),
+            tr.hours * 60
+          );
+      } else {
         timeRepostsWithEqualCombined.push(tr);
       }
     }
   });
 
   return timeRepostsWithEqualCombined;
-}
+};
 
 const deleteTimeReport = (index) => {
   let timeReports = fileService.getCurrentDateTimeReportFileContents();
@@ -142,7 +168,9 @@ const logTimeReportContents = (timeReports) => {
   let totalHours = 0;
 
   timeReports.forEach((timeReport, key) => {
-    let timeReportString = `${key} | ${timeReport.name || "-"} | ${timeReport.description} | ${timeReport.hours}h\r\n`;
+    let timeReportString = `${key} | ${timeReport.name || "-"} | ${
+      timeReport.description
+    } | ${timeReport.hours}h\r\n`;
     output = output + timeReportString;
 
     if (timeReport.taskId) {
@@ -162,4 +190,3 @@ module.exports = {
   getYesterdaysTimeReports,
   getTodaysTimeReports,
 };
-

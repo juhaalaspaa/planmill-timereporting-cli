@@ -13,14 +13,25 @@ const getCurrentDateTimeReportFileContents = () => {
 
 const getMostRecentExistingTimeReportFileContents = () => {
   let mostRecentDateFilename = getMostRecentExistingDateFilename();
-  
-  if(mostRecentDateFilename) {
+
+  if (mostRecentDateFilename) {
     return readAndParseFile(mostRecentDateFilename);
-  }
-  else {
+  } else {
     return [];
   }
-}
+};
+
+const getExistingTimeReportFileContentsForPastDays = (pastDays) => {
+  let filenames = getExistingTimeReportFilenamesForPastDays(pastDays);
+  let fileContents = [];
+
+  filenames.forEach((filename) => {
+    let content = readAndParseFile(filename);
+    fileContents.push(content);
+  });
+
+  return fileContents;
+};
 
 const getCurrentDateFilename = () => {
   let currentDate = new Date();
@@ -30,24 +41,44 @@ const getCurrentDateFilename = () => {
 };
 
 const getMostRecentExistingDateFilename = () => {
-    let tryCount = 0;
-    let maxTryCount = 5;
+  let tryCount = 0;
+  let maxTryCount = 5;
 
-    while(tryCount <= maxTryCount) {
-        let currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - tryCount);
-        const currentDateString = currentDate.toISOString().split("T")[0];
-        let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
-        
-        if(fs.existsSync(currentDateTimeReportsFileName)) {
-            return currentDateTimeReportsFileName;
-        }
+  while (tryCount <= maxTryCount) {
+    let currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - tryCount);
+    const currentDateString = currentDate.toISOString().split("T")[0];
+    let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
 
-        tryCount++;
+    if (fs.existsSync(currentDateTimeReportsFileName)) {
+      return currentDateTimeReportsFileName;
     }
 
-    return null;
-  };
+    tryCount++;
+  }
+
+  return null;
+};
+
+const getExistingTimeReportFilenamesForPastDays = (pastDays) => {
+  let dayCount = 0;
+  let filenames = [];
+
+  while (dayCount < pastDays) {
+    let currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - dayCount);
+    const currentDateString = currentDate.toISOString().split("T")[0];
+    let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
+
+    if (fs.existsSync(currentDateTimeReportsFileName)) {
+      filenames.push(currentDateTimeReportsFileName);
+    }
+
+    dayCount++;
+  }
+
+  return filenames;
+};
 
 const writeFile = (fileName, contents) => {
   fs.writeFile(fileName, JSON.stringify(contents), { flag: "w" }, (err) => {
@@ -73,5 +104,6 @@ module.exports = {
   readAndParseFile,
   writeCurrentDateTimeReportContentsToFile,
   getCurrentDateTimeReportFileContents,
-  getMostRecentExistingTimeReportFileContents
+  getMostRecentExistingTimeReportFileContents,
+  getExistingTimeReportFileContentsForPastDays,
 };

@@ -12,15 +12,14 @@ const fetchTasks = async () => {
 
 const getProjectNameById = (id) => {
   let projects = fileService.readAndParseFile(config.filePaths.projects);
-  let foundProject = projects.find(x => x.id == id);
-  
-  if(foundProject) {
+  let foundProject = projects.find((x) => x.id == id);
+
+  if (foundProject) {
     return foundProject.name;
-  }
-  else {
+  } else {
     return id;
   }
-}
+};
 
 const getTaskNameById = (id) => {
   let foundTask = getTaskById(id);
@@ -30,7 +29,7 @@ const getTaskNameById = (id) => {
   } else {
     return id;
   }
-}
+};
 
 const getTaskById = (id) => {
   let tasks = fileService.readAndParseFile(config.filePaths.tasks);
@@ -61,10 +60,41 @@ const loadTaskSuggestionsFromFile = (searchTerm) => {
   });
 };
 
+const getMostRecentDescriptionOnTask = (
+  taskId,
+  numberOfPastDysToSearchWithin
+) => {
+  let foundDescription = "";
+  let mostRecentTimeReportFileContents =
+    fileService.getExistingTimeReportFileContentsForPastDays(
+      numberOfPastDysToSearchWithin
+    );
+
+  mostRecentTimeReportFileContents.every((timeReportFileContents) => {
+    filteredTimeReports = timeReportFileContents.filter(
+      (tr) => tr.taskId === taskId
+    );
+
+    filteredTimeReports.sort((a, b) => {
+      return a.finish == b.finish ? 0 : a.finish < b.finish ? 1 : -1;
+    });
+
+    if (filteredTimeReports.length > 0) {
+      foundDescription = filteredTimeReports[0].description;
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  return foundDescription;
+};
+
 module.exports = {
   fetchTasks,
   loadTaskSuggestionsFromFile,
   getTaskNameById,
   getTaskById,
-  getProjectNameById
+  getProjectNameById,
+  getMostRecentDescriptionOnTask,
 };
