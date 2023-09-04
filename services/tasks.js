@@ -23,16 +23,27 @@ const getProjectNameById = (id) => {
 }
 
 const getTaskNameById = (id) => {
-  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
-  let foundTask = tasks.find(x => x.id == id);
-  
-  if(foundTask) {
+  let foundTask = getTaskById(id);
+
+  if (foundTask) {
     return foundTask.name;
-  }
-  else {
+  } else {
     return id;
   }
 }
+
+const getTaskById = (id) => {
+  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
+  let foundTask = tasks.find((x) => x.id == id);
+
+  if (foundTask) {
+    foundTask.taskId = foundTask.id;
+    foundTask.projectId = foundTask.parent;    
+    return foundTask;
+  } else {
+    return null;
+  }
+};
 
 const loadTaskSuggestionsFromFile = (searchTerm) => {
   let tasks = fileService.readAndParseFile(config.filePaths.tasks);
@@ -53,5 +64,7 @@ const loadTaskSuggestionsFromFile = (searchTerm) => {
 module.exports = {
   fetchTasks,
   loadTaskSuggestionsFromFile,
-  getTaskNameById
+  getTaskNameById,
+  getTaskById,
+  getProjectNameById
 };

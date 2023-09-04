@@ -14,5 +14,8 @@
     "projects": "c:\\temp\\planmill\\projects.json",
     "timeReportsFolder": "c:\\temp\\planmill\\timereports"
   },
-  "workStartHour24clock": 8
+  "workStartHour24clock": 8,
+  "defaultLunchBreakLengthInHours": 0.5,
+  "presetTaskIds": [
+  ]
 }

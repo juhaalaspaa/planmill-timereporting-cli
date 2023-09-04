@@ -1,7 +1,7 @@
 {
   "name": "planmillcli",
-  "version": "1.0.0",
-  "description": "CLI sovellus, jolla voi kätevästi tehdä tuntikirjaukset Planmilla APIa hyödyntäen",
+  "version": "1.0.2",
+  "description": "CLI application for logging and uploading time reports to Planmill via API",
   "main": "./bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

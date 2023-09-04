@@ -3,6 +3,7 @@ const tasksService = require("../services/tasks");
 const timeReportsService = require("../services/timeReports");
 
 const helpers = require("../helpers/helpers");
+const config = require("../config/default");
 
 const yargs = require("yargs");
 const inquirer = require("inquirer");
@@ -119,6 +120,61 @@ yargs.command({
   },
 });
 
+// Log time report to a preset task
+yargs.command({
+  command: "p <preset>",
+  describe: "Log to a preset task",
+
+  handler(argv) {
+    let presetTaskId = config.presetTaskIds[argv.preset - 1];
+    let presetTask = null;
+
+    if (!presetTaskId) {
+      console.log("Preset task not found at " + argv.preset);
+      return;
+    } else {
+      presetTask = tasksService.getTaskById(presetTaskId);
+
+      if (!presetTask) {
+        console.log("Preset task not found by id " + presetTaskId);
+        return;
+      }
+
+      let presetProjectName = tasksService.getProjectNameById(
+        presetTask.parent
+      );
+      console.log(`Logging to task ${presetTask.name} (${presetProjectName})`);
+    }
+
+    inquirer
+      .prompt([
+        {
+          type: "number",
+          name: "hours",
+          message: "Hours:",
+        },
+        {
+          type: "string",
+          name: "description",
+          message: "Comment:",
+        },
+      ])
+      .then((answers) => {
+        let chosenTask = presetTask;
+        let description = helpers.formatDescription(answers.description);
+
+        const timeReport = {
+          taskId: chosenTask.taskId,
+          name: chosenTask.name,
+          projectId: chosenTask.projectId,
+          hours: answers.hours,
+          description: description,
+        };
+
+        timeReportsService.addTimeReport(timeReport);
+      });
+  },
+});
 
 // Log break on time report
 yargs.command({
@@ -144,6 +200,23 @@ yargs.command({
 
         timeReportsService.addTimeReport(timeReport);
       });
+  },
+});
+
+// Log lunch break on time report
+yargs.command({
+  command: "lb",
+  describe: "Log lunch break on timereport",
+  builder: {
+  },
+
+  handler() {
+    const timeReport = {
+      hours: config.defaultLunchBreakLengthInHours,
+      description: "Lunch break"
+    };
+
+    timeReportsService.addTimeReport(timeReport);
   },
 });
 
