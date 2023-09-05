@@ -34,9 +34,9 @@ const addTimeReport = (newTimeReport) => {
 
   timeReports.push(newTimeReport);
 
-  logTimeReportContents(timeReports);
-
   fileService.writeCurrentDateTimeReportContentsToFile(timeReports);
+
+  logTimeReportContents(timeReports);
 };
 
 const pushTimeReports = () => {
@@ -88,13 +88,15 @@ const deleteTimeReport = (index) => {
   let timeReports = fileService.getCurrentDateTimeReportFileContents();
   timeReports.splice(index, 1);
 
-  logTimeReportContents(timeReports);
-
   fileService.writeCurrentDateTimeReportContentsToFile(timeReports);
+
+  logTimeReportContents(timeReports);
 };
 
-const getStartAndFinishtimeFromPreviousTimeReport = (trHours) => {
-  let timeReports = fileService.getCurrentDateTimeReportFileContents();
+const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
+  if (!timeReports) {
+    timeReports = fileService.getCurrentDateTimeReportFileContents();
+  }
   let start;
   let finish;
 
@@ -161,26 +163,47 @@ const getYesterdaysTimeReports = async () => {
     return a.hours == b.hours ? 0 : a.hours < b.hours ? 1 : -1;
   });
 
-  logTimeReportContents(mappedTimeReports);
+  logTimeReportContents(mappedTimeReports, false);
 };
-const logTimeReportContents = (timeReports) => {
+
+const logTimeReportContents = (timeReports, logUnloggedTime = true) => {
   let output = "\r\n";
   let totalHours = 0;
 
   timeReports.forEach((timeReport, key) => {
-    let timeReportString = `${key} | ${timeReport.name || "-"} | ${
-      timeReport.description
-    } | ${timeReport.hours}h\r\n`;
-    output = output + timeReportString;
+    output += getTimeReportLogRow(timeReport, key);
 
     if (timeReport.taskId) {
       totalHours += timeReport.hours;
     }
   });
 
+  if (logUnloggedTime) {
+    let unlogged = getStartAndFinishtimeFromPreviousTimeReport(
+      null,
+      timeReports
+    );
+
+    if (unlogged.hours > 0) {
+      let unloggedTimeRow = {
+        name: "NOT YET LOGGED",
+        description: "???",
+        hours: unlogged.hours,
+      };
+
+      output += getTimeReportLogRow(unloggedTimeRow, "*");
+    }
+  }
+
   output = output + "\r\nTotal hours: " + totalHours + " h\r\n";
 
   console.log(output);
+};
+
+const getTimeReportLogRow = (timeReport, key) => {
+  return `${key} | ${timeReport.name || "-"} | ${timeReport.description} | ${
+    timeReport.hours
+  }h\r\n`;
 };
 
 module.exports = {
