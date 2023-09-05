@@ -12,9 +12,8 @@ const inquirer = require("inquirer");
 yargs.command({
   command: "fetch",
   describe: "Fetch your Planmill tasks",
-  builder: {},
 
-  handler(argv) {
+  handler() {
     tasksService.fetchTasks();
   },
 });
@@ -23,23 +22,21 @@ yargs.command({
 yargs.command({
   command: "push",
   describe: "Push time reports for current date",
-  builder: {},
 
-  handler(argv) {
+  handler() {
     timeReportsService.pushTimeReports();
   },
 });
 
 // Get todays time reports (local)
 yargs.command({
-    command: "t",
-    describe: "Get todays time reports (local)",
-    builder: {},
-  
-    handler(argv) {
-      timeReportsService.getTodaysTimeReports();
-    },
-  });
+  command: "t",
+  describe: "Get todays time reports (local)",
+
+  handler() {
+    timeReportsService.getTodaysTimeReports();
+  },
+});
 
 // Get yesterday time reports from planmill
 yargs.command({
@@ -47,22 +44,15 @@ yargs.command({
   describe: "Fetch yesterdays time reports (Planmill)",
   builder: {},
 
-  handler(argv) {
+  handler() {
     timeReportsService.getYesterdaysTimeReports();
   },
 });
 
 // Delete single time report
 yargs.command({
-  command: "d",
+  command: "d <i>",
   describe: "Delete single time report",
-  builder: {
-    i: {
-      describe: "Index of time report to be deleted",
-      demandOption: true,
-      type: "number",
-    },
-  },
 
   handler(argv) {
     timeReportsService.deleteTimeReport(argv.i);
@@ -71,18 +61,13 @@ yargs.command({
 
 // Log time report
 yargs.command({
-  command: "l",
+  command: "l <taskSearchTerm..>",
   describe: "Log timereport",
-  builder: {
-    t: {
-      describe: "Task search term",
-      demandOption: true,
-      type: "string",
-    },
-  },
 
   handler(argv) {
-    const suggestedTasks = tasksService.loadTaskSuggestionsFromFile(argv.t);
+    const suggestedTasks = tasksService.loadTaskSuggestionsFromFile(
+      argv.taskSearchTerm.join(" ")
+    );
 
     inquirer
       .prompt([
@@ -112,7 +97,7 @@ yargs.command({
           name: chosenTask.name,
           projectId: chosenTask.projectId,
           hours: answers.hours,
-          description: description
+          description: description,
         };
 
         timeReportsService.addTimeReport(timeReport);
@@ -179,9 +164,8 @@ yargs.command({
 // Log break on time report
 yargs.command({
   command: "b",
-  describe: "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
-  builder: {
-  },
+  describe:
+    "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
 
   handler(argv) {
     inquirer
@@ -189,13 +173,12 @@ yargs.command({
         {
           name: "hours",
           message: "Hours:",
-        }
+        },
       ])
       .then((answers) => {
-
         const timeReport = {
           hours: answers.hours,
-          description: "Break"
+          description: "Break",
         };
 
         timeReportsService.addTimeReport(timeReport);
@@ -207,13 +190,11 @@ yargs.command({
 yargs.command({
   command: "lb",
   describe: "Log lunch break on timereport",
-  builder: {
-  },
 
   handler() {
     const timeReport = {
       hours: config.defaultLunchBreakLengthInHours,
-      description: "Lunch break"
+      description: "Lunch break",
     };
 
     timeReportsService.addTimeReport(timeReport);
