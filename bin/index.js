@@ -178,7 +178,8 @@ yargs.command({
       .then((answers) => {
         const timeReport = {
           hours: answers.hours,
-          description: "Break",
+          name: "BREAK",
+          description: "---",
         };
 
         timeReportsService.addTimeReport(timeReport);
@@ -194,7 +195,8 @@ yargs.command({
   handler() {
     const timeReport = {
       hours: config.defaultLunchBreakLengthInHours,
-      description: "Lunch break",
+      name: "BREAK",
+      description: "Lunch",
     };
 
     timeReportsService.addTimeReport(timeReport);
