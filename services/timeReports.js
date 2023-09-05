@@ -86,6 +86,11 @@ combineEqualTimeReports = (timeReports) => {
 
 const deleteTimeReport = (index) => {
   let timeReports = fileService.getCurrentDateTimeReportFileContents();
+
+  if (!index) {
+    index = timeReports.length - 1;
+  }
+  
   timeReports.splice(index, 1);
 
   fileService.writeCurrentDateTimeReportContentsToFile(timeReports);

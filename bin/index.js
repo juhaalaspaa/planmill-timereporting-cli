@@ -51,7 +51,7 @@ yargs.command({
 
 // Delete single time report
 yargs.command({
-  command: "d <i>",
+  command: "d [i]",
   describe: "Delete single time report",
 
   handler(argv) {
