@@ -37,11 +37,24 @@ const getTaskById = (id) => {
 
   if (foundTask) {
     foundTask.taskId = foundTask.id;
-    foundTask.projectId = foundTask.parent;    
+    foundTask.projectId = foundTask.parent;
     return foundTask;
   } else {
     return null;
   }
+};
+
+const getTasksByIds = (ids) => {
+  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
+  let foundTasks = tasks.filter((x) => ids.some((id) => x.id == id));
+
+  foundTasks.forEach((task) => {
+    task.taskId = task.id;
+    task.projectId = task.parent;
+    task.projectName = getProjectNameById(task.parent);
+  });
+
+  return foundTasks;
 };
 
 const loadTaskSuggestionsFromFile = (searchTerm) => {
@@ -90,6 +103,22 @@ const getMostRecentDescriptionOnTask = (
   return foundDescription;
 };
 
+const listPresetTasks = () => {
+  console.log();
+
+  const tasks = getTasksByIds(config.presetTaskIds);
+  config.presetTaskIds.forEach((presetTaskId, key) => {
+    let task = tasks.find((x) => x.id == presetTaskId);
+    if (task) {
+      console.log(`${key + 1}: ${task.name} (${task.projectName})`);
+    } else {
+      console.log(`${key + 1}: PRESET TASK NOT FOUND`);
+    }
+  });
+
+  console.log();
+};
+
 module.exports = {
   fetchTasks,
   loadTaskSuggestionsFromFile,
@@ -97,4 +126,5 @@ module.exports = {
   getTaskById,
   getProjectNameById,
   getMostRecentDescriptionOnTask,
+  listPresetTasks,
 };

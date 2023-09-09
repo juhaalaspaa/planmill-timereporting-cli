@@ -203,4 +203,14 @@ yargs.command({
   },
 });
 
+// List preset tasks
+yargs.command({
+  command: "lp",
+  describe: "List preset tasks",
+
+  handler() {
+    tasksService.listPresetTasks();
+  },
+});
+
 yargs.parse();
