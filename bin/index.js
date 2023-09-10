@@ -80,12 +80,17 @@ yargs.command({
         {
           type: "number",
           name: "hours",
-          message: "Hours:",
+          message: 'Hours:',
+          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
         },
         {
           type: "string",
           name: "description",
           message: "Comment:",
+          default: (answers) => {
+            var defaultDescription = timeReportsService.getMostRecentDescriptionOnTask(answers.task.taskId, 15);
+            return defaultDescription;
+          }
         },
       ])
       .then((answers) => {
@@ -136,12 +141,14 @@ yargs.command({
         {
           type: "number",
           name: "hours",
-          message: "Hours:",
+          message: 'Hours:',
+          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
         },
         {
           type: "string",
           name: "description",
           message: "Comment:",
+          default: timeReportsService.getMostRecentDescriptionOnTask(presetTask.taskId, 15)
         },
       ])
       .then((answers) => {
@@ -168,11 +175,13 @@ yargs.command({
     "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
 
   handler(argv) {
+
     inquirer
       .prompt([
         {
           name: "hours",
           message: "Hours:",
+          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
         },
       ])
       .then((answers) => {

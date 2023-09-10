@@ -17,11 +17,10 @@ const addTimeReport = (newTimeReport) => {
   newTimeReport.hours = newTimeReport.hours || calculatedTimes.hours;
 
   if (!newTimeReport.description) {
-    let mostRecentDescriptionForTask =
-      tasksService.getMostRecentDescriptionOnTask(
-        newTimeReport.taskId,
-        numberOfPastDysToSearchWithin
-      );
+    let mostRecentDescriptionForTask = getMostRecentDescriptionOnTask(
+      newTimeReport.taskId,
+      numberOfPastDysToSearchWithin
+    );
     if (!mostRecentDescriptionForTask) {
       console.log(
         `Could not find any previous description for task ${newTimeReport.taskId} within ${numberOfPastDysToSearchWithin} days. Aborting...`
@@ -90,7 +89,7 @@ const deleteTimeReport = (index) => {
   if (!index) {
     index = timeReports.length - 1;
   }
-  
+
   timeReports.splice(index, 1);
 
   fileService.writeCurrentDateTimeReportContentsToFile(timeReports);
@@ -143,6 +142,11 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
   let hours = helpers.getDifferenceInMinutes(start, finish) / 60;
 
   return { start, finish, hours };
+};
+
+const getNextTimeReportHoursFromPreviousTimeReport = () => {
+  let result = getStartAndFinishtimeFromPreviousTimeReport();
+  return result.hours;
 };
 
 const getTodaysTimeReports = () => {
@@ -211,10 +215,43 @@ const getTimeReportLogRow = (timeReport, key) => {
   }h\r\n`;
 };
 
+const getMostRecentDescriptionOnTask = (
+  taskId,
+  numberOfPastDysToSearchWithin
+) => {
+  let foundDescription = "";
+  let mostRecentTimeReportFileContents =
+    fileService.getExistingTimeReportFileContentsForPastDays(
+      numberOfPastDysToSearchWithin
+    );
+
+  mostRecentTimeReportFileContents.every((timeReportFileContents) => {
+    filteredTimeReports = timeReportFileContents.filter(
+      (tr) => tr.taskId === taskId
+    );
+
+    filteredTimeReports.sort((a, b) => {
+      return a.finish == b.finish ? 0 : a.finish < b.finish ? 1 : -1;
+    });
+
+    if (filteredTimeReports.length > 0) {
+      foundDescription = filteredTimeReports[0].description;
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  return foundDescription;
+};
+
 module.exports = {
   addTimeReport,
   pushTimeReports,
   deleteTimeReport,
   getYesterdaysTimeReports,
   getTodaysTimeReports,
+  getStartAndFinishtimeFromPreviousTimeReport,
+  getNextTimeReportHoursFromPreviousTimeReport,
+  getMostRecentDescriptionOnTask,
 };
