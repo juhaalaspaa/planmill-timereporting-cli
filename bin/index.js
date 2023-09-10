@@ -80,17 +80,19 @@ yargs.command({
         {
           type: "number",
           name: "hours",
-          message: 'Hours:',
-          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
+          message: "Hours:",
+          default:
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
         },
         {
           type: "string",
           name: "description",
           message: "Comment:",
-          default: (answers) => {
-            var defaultDescription = timeReportsService.getMostRecentDescriptionOnTask(answers.task.taskId, 15);
-            return defaultDescription;
-          }
+          default: (answers) =>
+            timeReportsService.getMostRecentDescriptionOnTask(
+              answers.task.taskId,
+              15
+            ),
         },
       ])
       .then((answers) => {
@@ -141,14 +143,18 @@ yargs.command({
         {
           type: "number",
           name: "hours",
-          message: 'Hours:',
-          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
+          message: "Hours:",
+          default:
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
         },
         {
           type: "string",
           name: "description",
           message: "Comment:",
-          default: timeReportsService.getMostRecentDescriptionOnTask(presetTask.taskId, 15)
+          default: timeReportsService.getMostRecentDescriptionOnTask(
+            presetTask.taskId,
+            15
+          ),
         },
       ])
       .then((answers) => {
@@ -168,20 +174,68 @@ yargs.command({
   },
 });
 
+// Log time report to most used tasks
+yargs.command({
+  command: "m",
+  describe: "Log to most used tasks",
+
+  handler() {
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "task",
+          message: "Select task:",
+          choices: tasksService.getMostUsedTaskFromPastDays(30),
+        },
+        {
+          type: "number",
+          name: "hours",
+          message: "Hours:",
+          default:
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
+        },
+        {
+          type: "string",
+          name: "description",
+          message: "Comment:",
+          default: (answers) =>
+            timeReportsService.getMostRecentDescriptionOnTask(
+              answers.task.taskId,
+              15
+            ),
+        },
+      ])
+      .then((answers) => {
+        let description = helpers.formatDescription(answers.description);
+
+        const timeReport = {
+          taskId: answers.task.taskId,
+          name: answers.task.name,
+          projectId: answers.task.projectId,
+          hours: answers.hours,
+          description: description,
+        };
+
+        timeReportsService.addTimeReport(timeReport);
+      });
+  },
+});
+
 // Log break on time report
 yargs.command({
   command: "b",
   describe:
     "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
 
-  handler(argv) {
-
+  handler() {
     inquirer
       .prompt([
         {
           name: "hours",
           message: "Hours:",
-          default: timeReportsService.getNextTimeReportHoursFromPreviousTimeReport()
+          default:
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
         },
       ])
       .then((answers) => {

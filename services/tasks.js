@@ -73,36 +73,6 @@ const loadTaskSuggestionsFromFile = (searchTerm) => {
   });
 };
 
-const getMostRecentDescriptionOnTask = (
-  taskId,
-  numberOfPastDysToSearchWithin
-) => {
-  let foundDescription = "";
-  let mostRecentTimeReportFileContents =
-    fileService.getExistingTimeReportFileContentsForPastDays(
-      numberOfPastDysToSearchWithin
-    );
-
-  mostRecentTimeReportFileContents.every((timeReportFileContents) => {
-    filteredTimeReports = timeReportFileContents.filter(
-      (tr) => tr.taskId === taskId
-    );
-
-    filteredTimeReports.sort((a, b) => {
-      return a.finish == b.finish ? 0 : a.finish < b.finish ? 1 : -1;
-    });
-
-    if (filteredTimeReports.length > 0) {
-      foundDescription = filteredTimeReports[0].description;
-      return false;
-    } else {
-      return true;
-    }
-  });
-
-  return foundDescription;
-};
-
 const listPresetTasks = () => {
   console.log();
 
@@ -119,12 +89,58 @@ const listPresetTasks = () => {
   console.log();
 };
 
+const getMostUsedTaskFromPastDays = (numberOfPastDysToSearchWithin) => {
+  let mostRecentTimeReportFileContents =
+    fileService.getExistingTimeReportFileContentsForPastDays(
+      numberOfPastDysToSearchWithin
+    );
+
+  let foundTasks = [];
+
+  mostRecentTimeReportFileContents.forEach((timeReportFileContents) => {
+    timeReportFileContents.forEach((timeReport) => {
+      if (timeReport.taskId) {
+        let foundIndex = foundTasks.findIndex(
+          (x) => x.taskId == timeReport.taskId
+        );
+        if (foundIndex > -1) {
+          let foundTask = foundTasks[foundIndex];
+          foundTask.count++;
+        } else {
+          foundTasks.push({
+            taskId: timeReport.taskId,
+            name: timeReport.name,
+            projectName: getProjectNameById(timeReport.projectId),
+            parent: timeReport.projectId,
+            count: 1,
+          });
+        }
+      }
+    });
+  });
+
+  foundTasks = foundTasks.filter(
+    (x) => !config.planmill.projectIdsNotToFetch.includes(x.parent)
+  );
+
+  foundTasks.sort((a, b) => {
+    return a.count == b.count ? 0 : a.count < b.count ? 1 : -1;
+  });
+
+  return foundTasks.map((task) => {
+    return {
+      name: `${task.name} (${task.projectName})`,
+      value: { taskId: task.taskId, projectId: task.parent, name: task.name },
+    };
+  });
+};
+
 module.exports = {
   fetchTasks,
   loadTaskSuggestionsFromFile,
   getTaskNameById,
   getTaskById,
   getProjectNameById,
-  getMostRecentDescriptionOnTask,
   listPresetTasks,
+  getMostUsedTaskFromPastDays,
 };
