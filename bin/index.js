@@ -118,7 +118,7 @@ yargs.command({
   describe: "Log to a preset task",
 
   handler(argv) {
-    let presetTaskId = config.presetTaskIds[argv.preset - 1];
+    let presetTaskId = config.planmill.presetTaskIds[argv.preset - 1];
     let presetTask = null;
 
     if (!presetTaskId) {
@@ -257,7 +257,7 @@ yargs.command({
 
   handler() {
     const timeReport = {
-      hours: config.defaultLunchBreakLengthInHours,
+      hours: config.general.defaultLunchBreakLengthInHours,
       name: "BREAK",
       description: "Lunch",
     };

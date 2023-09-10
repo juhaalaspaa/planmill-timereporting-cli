@@ -76,8 +76,8 @@ const loadTaskSuggestionsFromFile = (searchTerm) => {
 const listPresetTasks = () => {
   console.log();
 
-  const tasks = getTasksByIds(config.presetTaskIds);
-  config.presetTaskIds.forEach((presetTaskId, key) => {
+  const tasks = getTasksByIds(config.planmill.presetTaskIds);
+  config.planmill.presetTaskIds.forEach((presetTaskId, key) => {
     let task = tasks.find((x) => x.id == presetTaskId);
     if (task) {
       console.log(`${key + 1}: ${task.name} (${task.projectName})`);

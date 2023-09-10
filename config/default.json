@@ -5,6 +5,7 @@
     "clientId": "",
     "clientSecret": "",
     "userId": 0,
+    "presetTaskIds": [],
     "additionalProjectIdsToFetch": [],
     "projectIdsNotToFetch": []
   },
@@ -14,8 +15,8 @@
     "projects": "c:\\temp\\planmill\\projects.json",
     "timeReportsFolder": "c:\\temp\\planmill\\timereports"
   },
-  "workStartHour24clock": 8,
-  "defaultLunchBreakLengthInHours": 0.5,
-  "presetTaskIds": [
-  ]
+  "general": {
+    "workStartHour24clock": 8,
+    "defaultLunchBreakLengthInHours": 0.5
+  }
 }

@@ -106,7 +106,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
 
   if (timeReports.length == 0) {
     start = new Date();
-    start.setHours(config.workStartHour24clock);
+    start.setHours(config.general.workStartHour24clock);
     start.setMinutes(0);
     start.setSeconds(0);
   } else {
@@ -127,7 +127,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
 
       start = new Date();
 
-      start.setHours(config.workStartHour24clock + reportedHours);
+      start.setHours(config.general.workStartHour24clock + reportedHours);
       start.setMinutes(reportedMinutes);
     }
   }
