@@ -7,6 +7,9 @@ const config = require("../config/default");
 
 const yargs = require("yargs");
 const inquirer = require("inquirer");
+const inquirerPrompt = require("inquirer-autocomplete-prompt");
+
+inquirer.registerPrompt("autocomplete", inquirerPrompt);
 
 // Fetch tasks
 yargs.command({
@@ -59,23 +62,26 @@ yargs.command({
   },
 });
 
+function searchTasks(_, input = "") {
+  return new Promise((resolve) => {
+    let tasks = tasksService.loadTaskSuggestionsFromFile(input);
+    resolve(tasks);
+  });
+}
+
 // Log time report
 yargs.command({
-  command: "l <taskSearchTerm..>",
+  command: "l",
   describe: "Log timereport",
 
-  handler(argv) {
-    const suggestedTasks = tasksService.loadTaskSuggestionsFromFile(
-      argv.taskSearchTerm.join(" ")
-    );
-
+  handler() {
     inquirer
       .prompt([
         {
-          type: "list",
+          type: "autocomplete",
           name: "task",
           message: "Select task:",
-          choices: suggestedTasks,
+          source: searchTasks,
         },
         {
           type: "number",

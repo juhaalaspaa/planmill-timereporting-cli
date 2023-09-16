@@ -1,5 +1,5 @@
 # planmill-timereporting-cli
-Node CLI application for making time reports to planmill. A hackathon project with focus on generating value and effective UI to user (myself) rather than on code quality.
+Node CLI application for making time reports to planmill. A hackathon project with focus on creating value and effective UI to user (myself) rather than on code quality.
 
 ## installation
 Clone repo and run ```npm install -g .``` on project root
@@ -47,7 +47,7 @@ Clone repo and run ```npm install -g .``` on project root
 
 To log time report you will be prompted for **task**, **hours** and **time report description**. Prompts vary on the log method you use. Also some default values are calculated for you and those will be used by pressing giving empty answer/pressing enter on prompt.
 
-```pm l <taskSearchTerm..>``` Log time report by finding correct task with search term. Matching tasks are returned on list prompt.
+```pm l``` Log time report. Task, hours and description will be prompted.
 
 ```pm p <preset>``` Log time report to a preset task defined on config (1 = first item on presetTaskIds array)
 
