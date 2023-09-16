@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "planmill": {
+      "type": "object",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accessTokenUri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clientId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clientSecret": {
+          "type": "string",
+          "minLength": 1
+        },
+        "userId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "presetTaskIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "additionalProjectIdsToFetch": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "projectIdsNotToFetch": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "baseUrl",
+        "accessTokenUri",
+        "clientId",
+        "clientSecret",
+        "userId"
+      ]
+    },
+    "filePaths": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tasks": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projects": {
+          "type": "string",
+          "minLength": 1          
+        },
+        "timeReportsFolder": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "token",
+        "tasks",
+        "projects",
+        "timeReportsFolder"
+      ]
+    },
+    "general": {
+      "type": "object",
+      "properties": {
+        "workStartHour24clock": {
+          "type": "integer"
+        },
+        "defaultLunchBreakLengthInHours": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "workStartHour24clock",
+        "defaultLunchBreakLengthInHours"
+      ]
+    }
+  },
+  "required": [
+    "planmill",
+    "filePaths",
+    "general"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "planmillcli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "CLI application for logging and uploading time reports to Planmill via API",
   "main": "./bin/index.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "form-data": "^4.0.0",
     "inquirer": "^8.0.0",
     "inquirer-autocomplete-prompt": "^2.0.0",
+    "jsonschema": "^1.4.1",
     "yargs": "^17.7.1"
   }
 }

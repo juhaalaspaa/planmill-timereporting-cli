@@ -4,10 +4,16 @@ const timeReportsService = require("../services/timeReports");
 
 const helpers = require("../helpers/helpers");
 const config = require("../config/default");
+const configSchema = require("../config/schema");
 
 const yargs = require("yargs");
 const inquirer = require("inquirer");
 const inquirerPrompt = require("inquirer-autocomplete-prompt");
+
+// Config validation
+const Validator = require("jsonschema").Validator;
+const validator = new Validator();
+validator.validate(config, configSchema, { throwFirst: true });
 
 inquirer.registerPrompt("autocomplete", inquirerPrompt);
 
