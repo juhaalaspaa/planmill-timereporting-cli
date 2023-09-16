@@ -306,6 +306,19 @@ yargs.command({
   },
 });
 
+// Log break with hours on time report
+yargs.command({
+  command: "b <hours>",
+  describe:
+    "Log break on timereport, first break (+ or - hours) can be used to manipulate logging start time",
+
+  handler(argv) {
+    const timeReport = { hours: argv.hours, name: "BREAK", description: "---" };
+
+    timeReportsService.addTimeReport(timeReport);
+  },
+});
+
 // Log lunch break on time report
 yargs.command({
   command: "lb",
