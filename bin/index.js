@@ -64,8 +64,23 @@ yargs.command({
 
 function searchTasks(_, input = "") {
   return new Promise((resolve) => {
-    let tasks = tasksService.loadTaskSuggestionsFromFile(input);
+    let lowerCaseInput = input.toLowerCase();
+    let tasks = tasksService.loadTaskSuggestionsFromFile(lowerCaseInput);
     resolve(tasks);
+  });
+}
+
+function searchDescriptions(taskId, input = "") {
+  return new Promise((resolve) => {
+    let lowerCaseInput = input.toLowerCase();
+    let descriptions = timeReportsService.getPreviousDescriptionsOnTask(
+      taskId,
+      60
+    );
+    let filteredDescriptions = descriptions.filter((d) =>
+      d.toLowerCase().includes(lowerCaseInput)
+    );
+    resolve(filteredDescriptions);
   });
 }
 
@@ -99,6 +114,18 @@ yargs.command({
               answers.task.taskId,
               15
             ),
+        },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (answers, input) =>
+            searchDescriptions(answers.task.taskId, input),
+          when: (answers) => {
+            return answers.description === "?";
+          },
         },
       ])
       .then((answers) => {
@@ -162,6 +189,17 @@ yargs.command({
             15
           ),
         },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (_, input) => searchDescriptions(presetTaskId, input),
+          when: (answers) => {
+            return answers.description === "?";
+          },
+        },
       ])
       .then((answers) => {
         let chosenTask = presetTask;
@@ -210,6 +248,18 @@ yargs.command({
               answers.task.taskId,
               15
             ),
+        },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (answers, input) =>
+            searchDescriptions(answers.task.taskId, input),
+          when: (answers) => {
+            return answers.description === "?";
+          },
         },
       ])
       .then((answers) => {

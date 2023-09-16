@@ -217,12 +217,13 @@ const getTimeReportLogRow = (timeReport, key) => {
 
 const getMostRecentDescriptionOnTask = (
   taskId,
-  numberOfPastDysToSearchWithin
+  numberOfPastDaysToSearchWithin
 ) => {
   let foundDescription = "";
+
   let mostRecentTimeReportFileContents =
     fileService.getExistingTimeReportFileContentsForPastDays(
-      numberOfPastDysToSearchWithin
+      numberOfPastDaysToSearchWithin
     );
 
   mostRecentTimeReportFileContents.every((timeReportFileContents) => {
@@ -245,6 +246,38 @@ const getMostRecentDescriptionOnTask = (
   return foundDescription;
 };
 
+const getPreviousDescriptionsOnTask = (
+  taskId,
+  numberOfPastDaysToSearchWithin
+) => {
+  let foundDescriptions = [];
+
+  let mostRecentTimeReportFileContents =
+    fileService.getExistingTimeReportFileContentsForPastDays(
+      numberOfPastDaysToSearchWithin
+    );
+
+  mostRecentTimeReportFileContents.forEach((timeReportFileContents) => {
+    filteredTimeReports = timeReportFileContents.filter(
+      (tr) => tr.taskId === taskId
+    );
+
+    filteredTimeReports.sort((a, b) => {
+      return a.finish == b.finish ? 0 : a.finish < b.finish ? 1 : -1;
+    });
+
+    if (filteredTimeReports.length > 0) {
+      filteredTimeReports.forEach((timeReport) => {
+        if (!foundDescriptions.includes(timeReport.description)) {
+          foundDescriptions.push(timeReport.description);
+        }
+      });
+    }
+  });
+
+  return foundDescriptions;
+};
+
 module.exports = {
   addTimeReport,
   pushTimeReports,
@@ -254,4 +287,5 @@ module.exports = {
   getStartAndFinishtimeFromPreviousTimeReport,
   getNextTimeReportHoursFromPreviousTimeReport,
   getMostRecentDescriptionOnTask,
+  getPreviousDescriptionsOnTask,
 };
