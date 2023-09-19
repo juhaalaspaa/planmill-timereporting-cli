@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added changelog
 
+### Fixed
+- Combined logging a break to single command with optional hour argument
+
 ## [1.0.8] - 2023-09-16
   
 ### Added
