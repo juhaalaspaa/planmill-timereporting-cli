@@ -4,7 +4,7 @@ const timeReportsService = require("../services/timeReports");
 const calendarService = require("../services/calendarService");
 
 const helpers = require("../helpers/helpers");
-const config = require("../config/default");
+const configProvider = require("../config/configurationProvider");
 const configSchema = require("../config/schema");
 
 const yargs = require("yargs");
@@ -14,7 +14,7 @@ const inquirerPrompt = require("inquirer-autocomplete-prompt");
 // Config validation
 const Validator = require("jsonschema").Validator;
 const validator = new Validator();
-validator.validate(config, configSchema, { throwFirst: true });
+validator.validate(configProvider.getConfig(), configSchema, { throwFirst: true });
 
 inquirer.registerPrompt("autocomplete", inquirerPrompt);
 
@@ -183,7 +183,7 @@ yargs.command({
   describe: "Log to a preset task",
 
   handler(argv) {
-    let presetTaskId = config.planmill.presetTaskIds[argv.preset - 1];
+    let presetTaskId = configProvider.getConfig().planmill.presetTaskIds[argv.preset - 1];
     let presetTask = null;
 
     if (!presetTaskId) {
@@ -383,7 +383,7 @@ yargs.command({
       .then((answers) => {
         if (!Number(answers.taskMethod) === NaN) {
           let taskNumber = Number(answers.taskMethod);
-          let presetTaskId = config.planmill.presetTaskIds[taskNumber - 1];
+          let presetTaskId = configProvider.getConfig().planmill.presetTaskIds[taskNumber - 1];
           let presetTask = null;
 
           if (!presetTaskId) {
@@ -450,7 +450,7 @@ yargs.command({
 
   handler() {
     const timeReport = {
-      hours: config.general.defaultLunchBreakLengthInHours,
+      hours: configProvider.getConfig().general.defaultLunchBreakLengthInHours,
       name: "BREAK",
       description: "Lunch",
     };

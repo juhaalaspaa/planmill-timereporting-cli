@@ -1,11 +1,11 @@
-const config = require("../config/default");
+const configProvider = require("../config/configurationProvider");
 const FormData = require("form-data");
 const axios = require("axios");
 const fs = require("fs");
 
 const getToken = async () => {
   try {
-    let tokenRaw = fs.readFileSync(config.filePaths.token);
+    let tokenRaw = fs.readFileSync(configProvider.getConfig().filePaths.token);
     let token = JSON.parse(tokenRaw);
 
     if (new Date(token.expireTime) > new Date()) {
@@ -14,13 +14,13 @@ const getToken = async () => {
   } catch {}
 
   const form = new FormData();
-  form.append("client_id", config.planmill.clientId);
-  form.append("client_secret", config.planmill.clientSecret);
+  form.append("client_id", configProvider.getConfig().planmill.clientId);
+  form.append("client_secret", configProvider.getConfig().planmill.clientSecret);
   form.append("grant_type", "client_credentials");
 
   return await axios({
     method: "post",
-    url: config.planmill.accessTokenUri,
+    url: configProvider.getConfig().planmill.accessTokenUri,
     data: form,
     headers: { ...form.getHeaders() },
   }).then((response) => {
@@ -28,7 +28,7 @@ const getToken = async () => {
     token.expireTime = new Date(new Date().getTime() + 60 * 60000);
 
     fs.writeFile(
-      config.filePaths.token,
+      configProvider.getConfig().filePaths.token,
       JSON.stringify(token),
       { flag: "w" },
       (err) => {
@@ -51,7 +51,7 @@ const getTasks = async () => {
     filteredProjects.map((project) => {
       return axios({
         method: "get",
-        url: `${config.planmill.baseUrl}projects/${project.id}/tasks`,
+        url: `${configProvider.getConfig().planmill.baseUrl}projects/${project.id}/tasks`,
         headers: {
           Authorization: `Bearer ${token.access_token}`,
         },
@@ -75,7 +75,7 @@ const postTimeReport = async (timeReport) => {
     start: new Date(timeReport.start).toISOString().replace("Z", "+0000"),
     finish: new Date(timeReport.finish).toISOString().replace("Z", "+0000"),
     project: timeReport.projectId,
-    person: config.planmill.userId,
+    person: configProvider.getConfig().planmill.userId,
     amount: timeReport.hours * 60,
     comment: timeReport.description,
     task: timeReport.taskId,
@@ -85,7 +85,7 @@ const postTimeReport = async (timeReport) => {
 
   return await axios({
     method: "post",
-    url: `${config.planmill.baseUrl}timereports`,
+    url: `${configProvider.getConfig().planmill.baseUrl}timereports`,
     data: pmTimeReport,
     headers: {
       Authorization: `Bearer ${token.access_token}`,
@@ -99,7 +99,7 @@ const postTimeReport = async (timeReport) => {
 const fetchYesterdaysTimeReports = async () => {
   const token = await getToken();
 
-  let url = `${config.planmill.baseUrl}timereports?person=${config.planmill.userId}&period=41`;
+  let url = `${configProvider.getConfig().planmill.baseUrl}timereports?person=${configProvider.getConfig().planmill.userId}&period=41`;
 
   // On monday, fetch fridays timereports
   if (new Date().getDay() == 1) {
@@ -116,7 +116,7 @@ const fetchYesterdaysTimeReports = async () => {
     intervalFinish.setSeconds(0);
     intervalFinish = intervalFinish.toISOString().replace("Z", "+0000");
 
-    url = `${config.planmill.baseUrl}timereports?person=${config.planmill.userId}&interval=start&intervalstart=${intervalStart}&intervalfinish=${intervalFinish}`;
+    url = `${configProvider.getConfig().planmill.baseUrl}timereports?person=${configProvider.getConfig().planmill.userId}&interval=start&intervalstart=${intervalStart}&intervalfinish=${intervalFinish}`;
   }
 
   return await axios({
@@ -133,7 +133,7 @@ const fetchYesterdaysTimeReports = async () => {
 async function getProjects(token) {
   const projects = await axios({
     method: "get",
-    url: `${config.planmill.baseUrl}projects?rowcount=500&viewtemplate=10`,
+    url: `${configProvider.getConfig().planmill.baseUrl}projects?rowcount=500&viewtemplate=10`,
     headers: {
       Authorization: `Bearer ${token.access_token}`,
     },
@@ -142,15 +142,15 @@ async function getProjects(token) {
   const filteredProjects = projects.data.filter((project) => {
     return (
       project.status < 4 &&
-      !config.planmill.projectIdsNotToFetch.some((id) => id === project.id)
+      !configProvider.getConfig().planmill.projectIdsNotToFetch.some((id) => id === project.id)
     );
   });
 
   const additionalProjectResponses = await Promise.all(
-    config.planmill.additionalProjectIdsToFetch.map((additionalProjectId) => {
+    configProvider.getConfig().planmill.additionalProjectIdsToFetch.map((additionalProjectId) => {
       return axios({
         method: "get",
-        url: `${config.planmill.baseUrl}projects/${additionalProjectId}`,
+        url: `${configProvider.getConfig().planmill.baseUrl}projects/${additionalProjectId}`,
         headers: {
           Authorization: `Bearer ${token.access_token}`,
         },

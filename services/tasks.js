@@ -1,27 +1,26 @@
 const planmillApiClient = require("../apiclient/planmillApiClient");
-const config = require("../config/default");
+const configProvider = require("../config/configurationProvider");
 const fileService = require("../services/files");
-const additionalTasks = require("../config/additionalTasks");
 const additionalTasksSchema = require("../config/additionalTasksSchema");
 
 const fetchTasks = async () => {
   // Validate addiotional tasks config
   const Validator = require("jsonschema").Validator;
   const validator = new Validator();
-  validator.validate(additionalTasks, additionalTasksSchema, { throwFirst: true });
+  validator.validate(configProvider.getAdditionalTasks(), additionalTasksSchema, { throwFirst: true });
 
   console.log("Fetching projects and tasks..");
   const { tasks, projects } = await planmillApiClient.getTasks();
 
   // Add additional tasks to the list
-  const combinedTasks = tasks.concat(additionalTasks);
+  const combinedTasks = tasks.concat(configProvider.getAdditionalTasks());
   
-  fileService.writeFile(config.filePaths.tasks, combinedTasks);
-  fileService.writeFile(config.filePaths.projects, projects);
+  fileService.writeFile(configProvider.getConfig().filePaths.tasks, combinedTasks);
+  fileService.writeFile(configProvider.getConfig().filePaths.projects, projects);
 };
 
 const getProjectNameById = (id) => {
-  let projects = fileService.readAndParseFile(config.filePaths.projects);
+  let projects = fileService.readAndParseFile(configProvider.getConfig().filePaths.projects);
   let foundProject = projects.find((x) => x.id == id);
 
   if (foundProject) {
@@ -42,7 +41,7 @@ const getTaskNameById = (id) => {
 };
 
 const getTaskById = (id) => {
-  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
+  let tasks = fileService.readAndParseFile(configProvider.getConfig().filePaths.tasks);
   let foundTask = tasks.find((x) => x.id == id);
 
   if (foundTask) {
@@ -55,7 +54,7 @@ const getTaskById = (id) => {
 };
 
 const getTasksByIds = (ids) => {
-  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
+  let tasks = fileService.readAndParseFile(configProvider.getConfig().filePaths.tasks);
   let foundTasks = tasks.filter((x) => ids.some((id) => x.id == id));
 
   foundTasks.forEach((task) => {
@@ -68,7 +67,7 @@ const getTasksByIds = (ids) => {
 };
 
 const loadTaskSuggestionsFromFile = (searchTerm) => {
-  let tasks = fileService.readAndParseFile(config.filePaths.tasks);
+  let tasks = fileService.readAndParseFile(configProvider.getConfig().filePaths.tasks);
   let lowercaseSearchTerm = searchTerm.toLowerCase();
   let filteredTasks = tasks.filter(
     (task) =>
@@ -86,8 +85,8 @@ const loadTaskSuggestionsFromFile = (searchTerm) => {
 const listPresetTasks = () => {
   console.log();
 
-  const tasks = getTasksByIds(config.planmill.presetTaskIds);
-  config.planmill.presetTaskIds.forEach((presetTaskId, key) => {
+  const tasks = getTasksByIds(configProvider.getConfig().planmill.presetTaskIds);
+  configProvider.getConfig().planmill.presetTaskIds.forEach((presetTaskId, key) => {
     let task = tasks.find((x) => x.id == presetTaskId);
     if (task) {
       console.log(`${key + 1}: ${task.name} (${task.projectName})`);
@@ -130,7 +129,7 @@ const getMostUsedTaskFromPastDays = (numberOfPastDysToSearchWithin) => {
   });
 
   foundTasks = foundTasks.filter(
-    (x) => !config.planmill.projectIdsNotToFetch.includes(x.parent)
+    (x) => !configProvider.getConfig().planmill.projectIdsNotToFetch.includes(x.parent)
   );
 
   foundTasks.sort((a, b) => {

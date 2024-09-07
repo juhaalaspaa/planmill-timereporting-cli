@@ -1,5 +1,5 @@
 const planmillApiClient = require("../apiclient/planmillApiClient");
-const config = require("../config/default");
+const configProvider = require("../config/configurationProvider");
 const helpers = require("../helpers/helpers");
 const tasksService = require("../services/tasks");
 const fileService = require("../services/files");
@@ -106,7 +106,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
 
   if (timeReports.length == 0) {
     start = new Date();
-    start.setHours(config.general.workStartHour24clock);
+    start.setHours(configProvider.getConfig().general.workStartHour24clock);
     start.setMinutes(0);
     start.setSeconds(0);
   } else {
@@ -127,7 +127,7 @@ const getStartAndFinishtimeFromPreviousTimeReport = (trHours, timeReports) => {
 
       start = new Date();
 
-      start.setHours(config.general.workStartHour24clock + reportedHours);
+      start.setHours(configProvider.getConfig().general.workStartHour24clock + reportedHours);
       start.setMinutes(reportedMinutes);
     }
   }

@@ -1,7 +1,7 @@
 const fs = require("fs");
-const config = require("../config/default");
+const configProvider = require("../config/configurationProvider");
 
-const TODAYS_GCAL_EVENTS_FILENAME = `${config.filePaths.baseFolder}\\todaysGCalEvents.json`;
+const TODAYS_GCAL_EVENTS_FILENAME = `${configProvider.getConfig().filePaths.baseFolder}\\todaysGCalEvents.json`;
 
 const writeCurrentDateTimeReportContentsToFile = (timeReports) => {
   let currentDateTimeReportsFileName = getCurrentDateFilename();
@@ -46,7 +46,7 @@ const getTodaysEventsFileContents = () => {
 const getCurrentDateFilename = () => {
   let currentDate = new Date();
   const currentDateString = currentDate.toISOString().split("T")[0];
-  let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
+  let currentDateTimeReportsFileName = `${configProvider.getConfig().filePaths.timeReportsFolder}\\${currentDateString}.json`;
   return currentDateTimeReportsFileName;
 };
 
@@ -58,7 +58,7 @@ const getMostRecentExistingDateFilename = () => {
     let currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - tryCount);
     const currentDateString = currentDate.toISOString().split("T")[0];
-    let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
+    let currentDateTimeReportsFileName = `${configProvider.getConfig().filePaths.timeReportsFolder}\\${currentDateString}.json`;
 
     if (fs.existsSync(currentDateTimeReportsFileName)) {
       return currentDateTimeReportsFileName;
@@ -78,7 +78,7 @@ const getExistingTimeReportFilenamesForPastDays = (pastDays) => {
     let currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - dayCount);
     const currentDateString = currentDate.toISOString().split("T")[0];
-    let currentDateTimeReportsFileName = `${config.filePaths.timeReportsFolder}\\${currentDateString}.json`;
+    let currentDateTimeReportsFileName = `${configProvider.getConfig().filePaths.timeReportsFolder}\\${currentDateString}.json`;
 
     if (fs.existsSync(currentDateTimeReportsFileName)) {
       filenames.push(currentDateTimeReportsFileName);
