@@ -21,7 +21,7 @@ const getDifferenceInMinutes = (startTime, endTime) => {
     return Math.round(difference / 60000);
 };
 
-function addMinutes(date, minutes) {
+const addMinutes = (date, minutes) => {
     return new Date(date.getTime() + minutes*60000);
 }
 
