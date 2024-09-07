@@ -5,10 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - yyyy-mm-dd
+## [1.0.9] - 2024-09-07
 
 ### Added
-- Added changelog
+- Add changelog
+- Add additional tasks configuration as fallback when API doesn't return certain tasks
 
 ### Fixed
 - Combined logging a break to single command with optional hour argument

@@ -1,12 +1,22 @@
 const planmillApiClient = require("../apiclient/planmillApiClient");
 const config = require("../config/default");
 const fileService = require("../services/files");
+const additionalTasks = require("../config/additionalTasks");
+const additionalTasksSchema = require("../config/additionalTasksSchema");
 
 const fetchTasks = async () => {
+  // Validate addiotional tasks config
+  const Validator = require("jsonschema").Validator;
+  const validator = new Validator();
+  validator.validate(additionalTasks, additionalTasksSchema, { throwFirst: true });
+
   console.log("Fetching projects and tasks..");
   const { tasks, projects } = await planmillApiClient.getTasks();
 
-  fileService.writeFile(config.filePaths.tasks, tasks);
+  // Add additional tasks to the list
+  const combinedTasks = tasks.concat(additionalTasks);
+  
+  fileService.writeFile(config.filePaths.tasks, combinedTasks);
   fileService.writeFile(config.filePaths.projects, projects);
 };
 
