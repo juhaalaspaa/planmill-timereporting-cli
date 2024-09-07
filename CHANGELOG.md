@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add new command to start time report from google calendar event (description and length)
 - Use past events summaries from google calendar as descriptions on existing commands
 
+### Changed
+- Bump axios from 1.3.4 to 1.7.5
+
 ## [1.0.9] - 2024-09-07
 
 ### Added
