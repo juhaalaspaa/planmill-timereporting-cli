@@ -48,6 +48,8 @@ const sortGCalEventsByRecentStart = (events) => {
     const startA = new Date(a.start.dateTime);
     const startB = new Date(b.start.dateTime);
 
+    // TODO: compare only times as recurring event have first event date as start date time  
+
     // Compare the absolute difference between the start times and the current time
     const diffA = now - startA;
     const diffB = now - startB;

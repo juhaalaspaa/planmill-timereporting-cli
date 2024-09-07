@@ -381,7 +381,7 @@ yargs.command({
         },
       ])
       .then((answers) => {
-        if (!Number(answers.taskMethod) === NaN) {
+        if (!Number.isNaN(answers.taskMethod)) {
           let taskNumber = Number(answers.taskMethod);
           let presetTaskId = configProvider.getConfig().planmill.presetTaskIds[taskNumber - 1];
           let presetTask = null;

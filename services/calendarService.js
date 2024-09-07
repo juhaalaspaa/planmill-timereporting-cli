@@ -14,9 +14,16 @@ const getTodaysEventsDescriptions = async (useFileCache = false) => {
 
   const sortedEvents = helpers.sortGCalEventsByRecentStart(events);
 
-  return sortedEvents.map((event, i) => {
-    return event.summary;
+  // TODO: configure events names that should be ignored 
+  distinctDescriptions = []; 
+
+  sortedEvents.forEach((event) => {
+    if (!distinctDescriptions.includes(event.summary)) {
+      distinctDescriptions.push(event.summary);
+    };
   });
+
+  return distinctDescriptions;
 };
 
 const getEventLenghtByName = (eventName) => {
