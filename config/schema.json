@@ -67,6 +67,10 @@
           "type": "string",
           "minLength": 1          
         },
+        "baseFolder": {
+          "type": "string",
+          "minLength": 1
+        },
         "timeReportsFolder": {
           "type": "string",
           "minLength": 1

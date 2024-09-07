@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const tasksService = require("../services/tasks");
 const timeReportsService = require("../services/timeReports");
+const calendarService = require("../services/calendarService");
 
 const helpers = require("../helpers/helpers");
 const config = require("../config/default");
@@ -90,6 +91,20 @@ function searchDescriptions(taskId, input = "") {
   });
 }
 
+function searchDescriptionsFromGCal(input = "") {
+  return new Promise(async (resolve) => {
+    let lowerCaseInput = input.toLowerCase();
+    let useCache = input !== "";
+    let descriptions = await calendarService.getTodaysEventsDescriptions(
+      useCache
+    );
+    let filteredDescriptions = descriptions.filter((d) =>
+      d.toLowerCase().includes(lowerCaseInput)
+    );
+    resolve(filteredDescriptions);
+  });
+}
+
 // Log time report
 yargs.command({
   command: "l",
@@ -131,6 +146,17 @@ yargs.command({
             searchDescriptions(answers.task.taskId, input),
           when: (answers) => {
             return answers.description === "?";
+          },
+        },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (_, input) => searchDescriptionsFromGCal(input),
+          when: (answers) => {
+            return answers.description === "-";
           },
         },
       ])
@@ -206,6 +232,17 @@ yargs.command({
             return answers.description === "?";
           },
         },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (_, input) => searchDescriptionsFromGCal(input),
+          when: (answers) => {
+            return answers.description === "-";
+          },
+        },
       ])
       .then((answers) => {
         let chosenTask = presetTask;
@@ -267,8 +304,102 @@ yargs.command({
             return answers.description === "?";
           },
         },
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (_, input) => searchDescriptionsFromGCal(input),
+          when: (answers) => {
+            return answers.description === "-";
+          },
+        },
       ])
       .then((answers) => {
+        let description = helpers.formatDescription(answers.description);
+
+        const timeReport = {
+          taskId: answers.task.taskId,
+          name: answers.task.name,
+          projectId: answers.task.projectId,
+          hours: answers.hours,
+          description: description,
+        };
+
+        timeReportsService.addTimeReport(timeReport);
+      });
+  },
+});
+
+// Log time report starting with calendar event
+yargs.command({
+  command: "c",
+  describe: "Log by calendar event",
+
+  handler() {
+    inquirer
+      .prompt([
+        {
+          type: "autocomplete",
+          name: "description",
+          message: "Comment:",
+          suggestOnly: true,
+          askAnswered: true,
+          source: (_, input) => searchDescriptionsFromGCal(input),
+        },
+        {
+          type: "number",
+          name: "hours",
+          message: "Hours:",
+          default: (inputs) =>
+            calendarService.getEventLenghtByName(inputs.description) ||
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
+        },
+        {
+          type: "string",
+          name: "taskMethod",
+          message: "How to select task (l, m, #):",
+        },
+        {
+          type: "autocomplete",
+          name: "task",
+          message: "Select task:",
+          source: searchTasks,
+          when: (answers) => {
+            return answers.taskMethod === "l";
+          },
+        },
+        {
+          type: "list",
+          name: "task",
+          message: "Select task:",
+          choices: tasksService.getMostUsedTaskFromPastDays(30),
+          when: (answers) => {
+            return answers.taskMethod === "m";
+          },
+        },
+      ])
+      .then((answers) => {
+        if (!Number(answers.taskMethod) === NaN) {
+          let taskNumber = Number(answers.taskMethod);
+          let presetTaskId = config.planmill.presetTaskIds[taskNumber - 1];
+          let presetTask = null;
+
+          if (!presetTaskId) {
+            console.log("Preset task not found at " + taskNumber);
+            return;
+          } else {
+            presetTask = tasksService.getTaskById(presetTaskId);
+
+            if (!presetTask) {
+              console.log("Preset task not found by id " + presetTaskId);
+              return;
+            }
+            answers.task = presetTask;
+          }
+        }
+
         let description = helpers.formatDescription(answers.description);
 
         const timeReport = {
@@ -292,20 +423,24 @@ yargs.command({
 
   handler(argv) {
     inquirer
-    .prompt([
-      {
-        name: "hours",
-        message: "Hours:",
-        default:
-          timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
-        when: !argv.hours
-      },
-    ])
-    .then((answers) => {
-      const timeReport = { hours: argv.hours || answers.hours, name: "BREAK", description: "---" };
-      timeReportsService.addTimeReport(timeReport);
-    });
-  }
+      .prompt([
+        {
+          name: "hours",
+          message: "Hours:",
+          default:
+            timeReportsService.getNextTimeReportHoursFromPreviousTimeReport(),
+          when: !argv.hours,
+        },
+      ])
+      .then((answers) => {
+        const timeReport = {
+          hours: argv.hours || answers.hours,
+          name: "BREAK",
+          description: "---",
+        };
+        timeReportsService.addTimeReport(timeReport);
+      });
+  },
 });
 
 // Log lunch break on time report

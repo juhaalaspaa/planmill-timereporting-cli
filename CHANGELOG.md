@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.10] - 2024-09-07
+
+### Added
+- Add new command to start time report from google calendar event (description and length)
+- Use past events summaries from google calendar as descriptions on existing commands
+
 ## [1.0.9] - 2024-09-07
 
 ### Added

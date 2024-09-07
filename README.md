@@ -30,6 +30,8 @@ Clone repo and run ```npm install -g .``` on project root
 
 **projects** (string) - Full path to projects json file
 
+**baseFolder** (string) - Path to misc files (e.g. gcal token)
+
 **timeReportsFolder** (string) - Path to time reports folder where to store single day time reports json
 
 ### general
@@ -38,6 +40,10 @@ Clone repo and run ```npm install -g .``` on project root
 
 **defaultLunchBreakLengthInHours** (number) - Default lenght of lunch break logged with lb command (e.g. 0.5)
 
+### Google Calendar integration
+
+config/credentials.json (TODO)
+
 ## usage
 
 ### First time usage
@@ -45,13 +51,15 @@ Clone repo and run ```npm install -g .``` on project root
 
 ### Log time report
 
-To log time report you will be prompted for **task**, **hours** and **time report description**. Prompts vary on the log method you use. Also some default values are calculated for you and those will be used by pressing giving empty answer/pressing enter on prompt. Also previous descriptions on chosen task can be picked as base value (press TAB, not ENTER) from autocompleted list by giving _?_ as description.
+To log time report you will be prompted for **task**, **hours** and **time report description**. Prompts vary on the log method you use. Also some default values are calculated for you and those will be used by pressing giving empty answer/pressing enter on prompt. Also previous descriptions on chosen task can be picked as base value (press TAB, not ENTER) from autocompleted list by giving _?_ as description. Also calendar past event names can be picked as base value from autocompleted list by giving _-_ as description.
 
 ```pm l``` Log time report. Task, hours and description will be prompted.
 
 ```pm p <preset>``` Log time report to a preset task defined on config (1 = first item on presetTaskIds array)
 
 ```pm m``` Log time report to most used task. Most used tasks within a month or so are returend on list prompt.
+
+```pm c``` Log time report starting with calendar event description and lenght
 
 ### Log break
 

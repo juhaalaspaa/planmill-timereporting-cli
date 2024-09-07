@@ -1,6 +1,8 @@
 const fs = require("fs");
 const config = require("../config/default");
 
+const TODAYS_GCAL_EVENTS_FILENAME = `${config.filePaths.baseFolder}\\todaysGCalEvents.json`;
+
 const writeCurrentDateTimeReportContentsToFile = (timeReports) => {
   let currentDateTimeReportsFileName = getCurrentDateFilename();
   writeFile(currentDateTimeReportsFileName, timeReports);
@@ -31,6 +33,14 @@ const getExistingTimeReportFileContentsForPastDays = (pastDays) => {
   });
 
   return fileContents;
+};
+
+const writeTodaysEventsToFile = (events) => {
+  writeFile(TODAYS_GCAL_EVENTS_FILENAME, events);
+};
+
+const getTodaysEventsFileContents = () => {
+  return readAndParseFile(TODAYS_GCAL_EVENTS_FILENAME);
 };
 
 const getCurrentDateFilename = () => {
@@ -106,4 +116,6 @@ module.exports = {
   getCurrentDateTimeReportFileContents,
   getMostRecentExistingTimeReportFileContents,
   getExistingTimeReportFileContentsForPastDays,
+  writeTodaysEventsToFile,
+  getTodaysEventsFileContents
 };

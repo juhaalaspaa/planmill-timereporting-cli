@@ -13,6 +13,7 @@
     "token": "c:\\temp\\planmill\\token.json",
     "tasks": "c:\\temp\\planmill\\tasks.json",
     "projects": "c:\\temp\\planmill\\projects.json",
+    "baseFolder": "c:\\temp\\planmill",
     "timeReportsFolder": "c:\\temp\\planmill\\timereports"
   },
   "general": {
