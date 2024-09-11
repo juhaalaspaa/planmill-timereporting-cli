@@ -41,27 +41,30 @@ const getEndOfDay = () => {
   return endOfDay;
 };
 
-const sortGCalEventsByRecentStart = (events) => {
-  const now = new Date();
+const filterIgnoredGCalEvents = (events, ignoredEventNames) => events.filter(x => ignoredEventNames.every(ignoredEvent => !x.summary?.includes(ignoredEvent)));
 
+const filterGCalEventsWithoutStartDateTime = (events) => events.filter(x => !!x.start?.dateTime);
+
+const setGCalEventDatesToToday = (events) => {
+  const todaysDatePart = new Date().toISOString().split("T")[0];
+
+  return events.map((event) => {
+    const startTimePart = new Date(event.start.dateTime).toISOString().split('T')[1];
+    const endTimePart = new Date(event.end.dateTime).toISOString().split('T')[1];
+
+    event.start.dateTime = `${todaysDatePart}T${startTimePart}`;
+    event.end.dateTime = `${todaysDatePart}T${endTimePart}`;
+
+    return event;
+  })  
+};
+
+const sortGCalEvents = (events) => { 
   return events.sort((a, b) => {
     const startA = new Date(a.start.dateTime);
     const startB = new Date(b.start.dateTime);
 
-    // TODO: compare only times as recurring event have first event date as start date time  
-
-    // Compare the absolute difference between the start times and the current time
-    const diffA = now - startA;
-    const diffB = now - startB;
-
-    // Sort based on how close the event's start time is to the current time, but only for past events
-    if (diffA > 0 && diffB > 0) {
-      return diffA - diffB; // Most recently started first
-    } else if (diffA <= 0 && diffB <= 0) {
-      return startA - startB; // Sort future events by their upcoming time
-    } else {
-      return diffA > 0 ? -1 : 1; // Give preference to past events
-    }
+    return startA - startB;
   });
 };
 
@@ -95,6 +98,9 @@ module.exports = {
   addMinutes,
   getStartOfDay,
   getEndOfDay,
-  sortGCalEventsByRecentStart,
+  filterIgnoredGCalEvents,
+  filterGCalEventsWithoutStartDateTime,
+  setGCalEventDatesToToday,
+  sortGCalEvents,
   getRoundedGCalEventLength,
 };

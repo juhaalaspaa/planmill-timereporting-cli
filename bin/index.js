@@ -469,4 +469,14 @@ yargs.command({
   },
 });
 
+// List todays agenda
+yargs.command({
+  command: "a",
+  describe: "List todays agenda (from google calendar events)",
+
+  handler: async () => {
+    await calendarService.listTodaysAgenda();
+  }
+});
+
 yargs.parse();

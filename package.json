@@ -1,6 +1,6 @@
 {
   "name": "planmillcli",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "CLI application for logging and uploading time reports to Planmill via API",
   "main": "./bin/index.js",
   "scripts": {

@@ -19,5 +19,8 @@
   "general": {
     "workStartHour24clock": 8,
     "defaultLunchBreakLengthInHours": 0.5
+  },
+  "calendar": {
+    "ignoreEventsMatching": []
   }
 }

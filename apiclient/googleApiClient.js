@@ -10,7 +10,7 @@ const configProvider = require("../config/configurationProvider");
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
+// The file gcalToken.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = `${configProvider.getConfig().filePaths.baseFolder}\\gcalToken.json`;
@@ -71,16 +71,15 @@ async function authorize() {
 }
 
 /**
- * Lists the next 10 events on the user's primary calendar.
+ * Lists todays events
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-async function requestTodaysPastEvents(auth) {
+async function requestTodaysEvents(auth) {
   const calendar = google.calendar({version: 'v3', auth});
   const res = await calendar.events.list({
     calendarId: 'primary',
     timeMin: helpers.getStartOfDay().toISOString(),
-    timeMax: new Date().toISOString(),
-    maxResults: 10
+    timeMax: helpers.getEndOfDay().toISOString(),
   });
   const events = res.data.items;
   if (!events || events.length === 0) {
@@ -91,10 +90,37 @@ async function requestTodaysPastEvents(auth) {
   return events;
 }
 
+/**
+ * Lists todays started events
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+async function requestTodaysPastEvents(auth) {
+  const calendar = google.calendar({version: 'v3', auth});
+  const res = await calendar.events.list({
+    calendarId: 'primary',
+    timeMin: helpers.getStartOfDay().toISOString(),
+    timeMax: new Date().toISOString()
+  });
+  const events = res.data.items;
+  if (!events || events.length === 0) {
+    console.log('No events found.');
+    return [];
+  }
+
+  return events;
+}
+
+const getTodaysEvents = async () => {
+  return await authorize()
+    .then(requestTodaysEvents)
+    .catch(console.error);
+};
+
 const getTodaysPastEvents = async () => {
   return await authorize()
     .then(requestTodaysPastEvents)
     .catch(console.error);
 };
 
-module.exports = { getTodaysPastEvents };
+
+module.exports = { getTodaysEvents, getTodaysPastEvents };

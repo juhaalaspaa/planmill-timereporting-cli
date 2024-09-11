@@ -97,6 +97,17 @@
         "workStartHour24clock",
         "defaultLunchBreakLengthInHours"
       ]
+    },
+    "calendar": {
+      "type": "object",
+      "properties": {
+        "ignoreEventsMatching": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
